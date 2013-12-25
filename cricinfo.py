@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 
 import sys
+# Later when complexity will arise we will use option parser
+# import argparse
 
 from BeautifulSoup import BeautifulSoup
 import requests
@@ -31,13 +33,20 @@ def scrapresults(choice):
         if response.status_code==200:
             soup = BeautifulSoup(response.text)
             print soup.title.text + "\n"
+
+            # More work it to be done in this loop as fetch scorecards, man of the match
             for matchestable in soup.findAll("div", attrs={"class":"div630Pad"}):
                 scores = [ score.text for score in matchestable.findAll("p", attrs={"class":"potMatchText mat_scores"}) ]
-                status = [ status.text for status in matchestable.findAll("p", attrs={"class":"potMatchText mat_status"}) ]
-                for matches in matchestable.findAll("p", attrs={"class":"potMatchHeading"}):
-                    print matches.text
-                    print scores.pop(0)
-                    print status.pop(0) + "\n"
+                statuses = [ status.text for status in matchestable.findAll("p", attrs={"class":"potMatchText mat_status"}) ]
+                matches = [ matches.text for matches in matchestable.findAll("p", attrs={"class":"potMatchHeading"}) ]
+                
+            for score, status, match in zip(scores, statuses, matches):
+                if not score:
+                    continue
+                else:
+                    print match
+                    print score
+                    print status + "\n"
         else:
             print "Network Error. Try again later."
     except IndexError:
